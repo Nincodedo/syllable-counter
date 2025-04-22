@@ -8,7 +8,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -19,9 +21,6 @@ jobs:
           java-version: 8
           cache: 'maven'
       - name: Test and deploy to GitHub Packages Maven repo
-        run: >-
-          echo "${{ secrets.MAVEN_SETTINGS_XML }}" > settings.xml
-          && ./mvnw
-          -s settings.xml
-          -P release
-          clean test deploy
+        run: ./mvnw --batch-mode -P release clean test deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
