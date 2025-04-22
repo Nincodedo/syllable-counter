@@ -44,7 +44,7 @@ import java.util.stream.Stream;
  */
 public class SyllableCounter {
 
-    private final static String EXCEPTIONS_PATH
+    private static final String EXCEPTIONS_PATH
             = "/eu/crydee/syllablecounter/english-exceptions.txt",
             SUBSYL_PATH = "/eu/crydee/syllablecounter/english-subsyls.txt",
             ADDSYL_PATH = "/eu/crydee/syllablecounter/english-addsyls.txt";
@@ -56,7 +56,7 @@ public class SyllableCounter {
     private final Set<Character> vowels;
 
     // Package protected for testing purposes
-    Stream<String> getRessourceLines(Class<?> clazz, String filepath) {
+    Stream<String> getResourceLines(Class<?> clazz, String filepath) {
         try (final BufferedReader fileReader = new BufferedReader(
                 new InputStreamReader(clazz.getResourceAsStream(filepath),
                 StandardCharsets.UTF_8)
@@ -70,7 +70,7 @@ public class SyllableCounter {
     }
 
     public SyllableCounter() {
-        exceptions = getRessourceLines(getClass(), EXCEPTIONS_PATH)
+        exceptions = getResourceLines(getClass(), EXCEPTIONS_PATH)
                 .filter(line -> !line.isEmpty() && !line.startsWith("#"))
                 .map(line -> line.split(" "))
                 .peek(fields -> {
@@ -83,11 +83,11 @@ public class SyllableCounter {
                 .collect(Collectors.toMap(
                         fields -> fields[1],
                         fields -> Integer.parseInt(fields[0])));
-        addSyls = getRessourceLines(getClass(), ADDSYL_PATH)
+        addSyls = getResourceLines(getClass(), ADDSYL_PATH)
                 .filter(line -> !line.isEmpty() && !line.startsWith("#"))
                 .map(Pattern::compile)
                 .collect(Collectors.toSet());
-        subSyls = getRessourceLines(getClass(), SUBSYL_PATH)
+        subSyls = getResourceLines(getClass(), SUBSYL_PATH)
                 .filter(line -> !line.isEmpty() && !line.startsWith("#"))
                 .map(Pattern::compile)
                 .collect(Collectors.toSet());
@@ -105,7 +105,7 @@ public class SyllableCounter {
     public int count(final String word) {
         if (word == null) {
             throw new NullPointerException("the word parameter was null.");
-        } else if (word.length() == 0) {
+        } else if (word.isEmpty()) {
             return 0;
         } else if (word.length() == 1) {
             return 1;
@@ -117,27 +117,27 @@ public class SyllableCounter {
             return exceptions.get(lowerCase);
         }
 
-        final String prunned;
+        final String pruned;
         if (lowerCase.charAt(lowerCase.length() - 1) == 'e') {
-            prunned = lowerCase.substring(0, lowerCase.length() - 1);
+            pruned = lowerCase.substring(0, lowerCase.length() - 1);
         } else {
-            prunned = lowerCase;
+            pruned = lowerCase;
         }
 
         int count = 0;
         boolean prevIsVowel = false;
-        for (char c : prunned.toCharArray()) {
+        for (char c : pruned.toCharArray()) {
             final boolean isVowel = vowels.contains(c);
             if (isVowel && !prevIsVowel) {
                 ++count;
             }
             prevIsVowel = isVowel;
         }
-        count += addSyls.stream()
-                .filter(pattern -> pattern.matcher(prunned).find())
+        count += (int) addSyls.stream()
+                .filter(pattern -> pattern.matcher(pruned).find())
                 .count();
-        count -= subSyls.stream()
-                .filter(pattern -> pattern.matcher(prunned).find())
+        count -= (int) subSyls.stream()
+                .filter(pattern -> pattern.matcher(pruned).find())
                 .count();
 
         return count > 0 ? count : 1;
