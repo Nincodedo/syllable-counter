@@ -5,6 +5,7 @@
 1 gaped
 1 h'm
 1 lb
+1 makes
 1 mimes
 1 ms
 1 peeped
@@ -26,6 +27,7 @@
 2 jr
 2 mangroves
 2 messieurs
+2 mistakes
 2 motioned
 2 moustaches
 2 mr
