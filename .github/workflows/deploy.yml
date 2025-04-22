@@ -18,13 +18,10 @@ jobs:
           distribution: temurin
           java-version: 8
           cache: 'maven'
-#TODO: figure out this later...
-#      - name: Test and deploy to OSSRH
-#        run: >-
-#          echo "${{ secrets.MAVEN_SETTINGS_XML }}" > settings.xml
-#          && mvn
-#          -s settings.xml
-#          -P release
-#          -Dgpg.keyName=${{ secrets.GPG_KEYNAME }}
-#          -Dgpg.passphrase="${{ secrets.GPG_PASSPHRASE }}"
-#          clean test deploy
+      - name: Test and deploy to GitHub Packages Maven repo
+        run: >-
+          echo "${{ secrets.MAVEN_SETTINGS_XML }}" > settings.xml
+          && ./mvnw
+          -s settings.xml
+          -P release
+          clean test deploy
